@@ -1,0 +1,27 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Outer circle (Watch Body) -->
+    <path
+        android:strokeColor="#9ECAFF"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M 54,28 A 26,26 0 1,1 53.9,28 Z" />
+        
+    <!-- Inner stopwatch hand indicators -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M 54,54 L 54,38 M 54,54 L 66,54" />
+        
+    <!-- Top stopwatch buttons -->
+    <path
+        android:fillColor="#9ECAFF"
+        android:pathData="M 46,16 h 16 v 4 h -16 z M 52,20 h 4 v 8 h -4 z" />
+</vector>

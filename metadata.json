@@ -1,0 +1,6 @@
+{
+  "name": "Quick Note & Time Tracker",
+  "description": "Quản lý thời gian, ghi chú nhanh dựa trên ma trận nổi tiếng Eisenhower, kèm báo cáo chi tiết và phân tích AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
