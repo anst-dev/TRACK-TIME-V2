@@ -42,7 +42,7 @@ fun StatsScreen(viewModel: TaskViewModel) {
         val list = DoubleArray(4) // Q1, Q2, Q3, Q4 actual minutes
         tasks.forEach {
             if (it.quadrant in 1..4) {
-                list[it.quadrant - 1] += it.actualMinutes.toDouble()
+                list[it.quadrant - 1] += (it.actualSeconds / 60.0)
             }
         }
         list

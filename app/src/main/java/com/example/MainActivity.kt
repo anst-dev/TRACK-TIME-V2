@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
-                AppMainLayout()
+                AppMainLayout(intent = intent)
             }
         }
     }
@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppMainLayout() {
+fun AppMainLayout(intent: android.content.Intent?) {
     val viewModel: TaskViewModel = viewModel()
     val navController = rememberNavController()
 
@@ -74,7 +74,7 @@ fun AppMainLayout() {
     var isUnlocked by remember { mutableStateOf(false) }
 
     // Toggle dialog layers
-    var showAddTask by remember { mutableStateOf(false) }
+    var showAddTask by remember { mutableStateOf(intent?.action == "ACTION_OPEN_ADD_TASK") }
     var showSettings by remember { mutableStateOf(false) }
 
     // If PIN enabled and not unlocked yet, show lock gate
@@ -157,7 +157,10 @@ fun AppMainLayout() {
                     }
                     composable(Screen.Sync.route) {
                         screenTitleState.value = "Đồng bộ đám mây"
-                        SyncScreen(viewModel = viewModel)
+                        SyncScreen(
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
                     }
                     composable(Screen.Ai.route) {
                         screenTitleState.value = "AI Khuyên & Phân Tích"

@@ -29,7 +29,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun SyncScreen(viewModel: TaskViewModel) {
+fun SyncScreen(
+    viewModel: TaskViewModel,
+    onBack: (() -> Unit)? = null
+) {
     val isConnected by viewModel.isGoogleSheetConnected.collectAsState()
     val sheetId by viewModel.googleSheetId.collectAsState()
     val sheetName by viewModel.googleSheetName.collectAsState()
@@ -57,7 +60,7 @@ fun SyncScreen(viewModel: TaskViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = {}) {
+            IconButton(onClick = { onBack?.invoke() }) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = ChronoText)
             }
             Text(
@@ -236,7 +239,71 @@ fun SyncScreen(viewModel: TaskViewModel) {
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // Quick Links and Excel Export Card
+        val context = androidx.compose.ui.platform.LocalContext.current
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = ChronoSurface),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(modifier = Modifier.padding(18.dp)) {
+                Text(
+                    text = "TIỆN ÍCH DỮ LIỆU",
+                    color = ChronoTextDim,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    // Open Spreadsheet button
+                    Button(
+                        onClick = { viewModel.openGoogleSheetInBrowser(context) },
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = AccentBlue),
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("link_to_sheet_button")
+                    ) {
+                        Icon(Icons.Default.OpenInNew, contentDescription = "Trang tính", modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Mở Bảng Tính",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    // Export Excel button
+                    Button(
+                        onClick = { viewModel.exportTasksToExcel(context) },
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = QuadrantGreen),
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("export_excel_button")
+                    ) {
+                        Icon(Icons.Default.Download, contentDescription = "Xuất Excel", modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Xuất Excel",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // History list logs
         Card(

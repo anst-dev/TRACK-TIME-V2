@@ -10,7 +10,7 @@ data class TaskEntity(
     val description: String,
     val quadrant: Int, // 1 to 4 (1: Red, 2: Green, 3: Orange, 4: Grey)
     val estimatedMinutes: Int,
-    val actualMinutes: Int,
+    val actualSeconds: Int,
     val status: String, // "DOING", "WAITING", "COMPLETED"
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
@@ -26,7 +26,7 @@ data class TimeLogEntity(
     val taskId: Int,
     val startTime: Long,
     val endTime: Long?,
-    val durationMinutes: Int,
+    val durationSeconds: Int,
     val isSynced: Boolean = false
 )
 

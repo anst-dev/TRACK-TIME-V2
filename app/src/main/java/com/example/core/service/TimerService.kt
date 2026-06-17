@@ -99,7 +99,7 @@ class TimerService : Service() {
                     taskId = taskId,
                     startTime = System.currentTimeMillis(),
                     endTime = null,
-                    durationMinutes = 0
+                    durationSeconds = 0
                 )
             )
 
@@ -174,13 +174,13 @@ class TimerService : Service() {
         val activeLog = dbLogs.firstOrNull { it.taskId == taskId && it.endTime == null }
         if (activeLog != null) {
             val endTime = System.currentTimeMillis()
-            val duration = ((endTime - activeLog.startTime) / (1000 * 60)).coerceAtLeast(1).toInt()
-            repository.updateTimeLog(activeLog.copy(endTime = endTime, durationMinutes = duration))
+            val durationSec = ((endTime - activeLog.startTime) / 1000).toInt()
+            repository.updateTimeLog(activeLog.copy(endTime = endTime, durationSeconds = durationSec))
 
             val task = repository.getTaskById(taskId)
             if (task != null) {
-                val newActual = task.actualMinutes + duration
-                repository.updateTask(task.copy(actualMinutes = newActual, updatedAt = System.currentTimeMillis()))
+                val newActual = task.actualSeconds + durationSec
+                repository.updateTask(task.copy(actualSeconds = newActual, updatedAt = System.currentTimeMillis()))
             }
         }
     }

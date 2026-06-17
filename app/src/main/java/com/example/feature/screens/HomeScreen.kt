@@ -49,7 +49,7 @@ fun HomeScreen(
         val times = DoubleArray(4) // Q1, Q2, Q3, Q4 in minutes
         tasks.forEach { task ->
             if (task.quadrant in 1..4) {
-                times[task.quadrant - 1] += task.actualMinutes.toDouble()
+                times[task.quadrant - 1] += (task.actualSeconds / 60.0)
             }
         }
         times
@@ -186,7 +186,7 @@ fun HomeScreen(
                     displayClock = displayClock,
                     activeTaskTitle = displayTaskTitle,
                     isRunning = isRunningHere,
-                    badgeText = "ẨN CẤP & QUAN TRỌNG",
+                    badgeText = "KHẨN CẤP & QUAN TRỌNG",
                     abbreviation = "DO",
                     onTogglePlay = { viewModel.startTimerByQuadrant(cat.id) }
                 )
@@ -212,7 +212,7 @@ fun HomeScreen(
                     displayClock = displayClock,
                     activeTaskTitle = displayTaskTitle,
                     isRunning = isRunningHere,
-                    badgeText = "CHIẾN LƯỢC",
+                    badgeText = "QUAN TRỌNG & KHÔNG KHẨN CẤP",
                     abbreviation = "PLAN",
                     onTogglePlay = { viewModel.startTimerByQuadrant(cat.id) }
                 )
@@ -245,7 +245,7 @@ fun HomeScreen(
                     displayClock = displayClock,
                     activeTaskTitle = displayTaskTitle,
                     isRunning = isRunningHere,
-                    badgeText = "ỦY THÁC",
+                    badgeText = "KHÔNG QUAN TRỌNG & KHẨN CẤP",
                     abbreviation = "DELEGATE",
                     onTogglePlay = { viewModel.startTimerByQuadrant(cat.id) }
                 )
@@ -271,7 +271,7 @@ fun HomeScreen(
                     displayClock = displayClock,
                     activeTaskTitle = displayTaskTitle,
                     isRunning = isRunningHere,
-                    badgeText = "BỎ QUA / THƯ GIÃN",
+                    badgeText = "KHÔNG QUAN TRỌNG & KHÔNG KHẨN CẤP",
                     abbreviation = "DROP",
                     onTogglePlay = { viewModel.startTimerByQuadrant(cat.id) }
                 )

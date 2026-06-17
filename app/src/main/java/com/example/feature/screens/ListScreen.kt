@@ -3,6 +3,7 @@ package com.example.feature.screens
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -229,6 +230,9 @@ fun ListScreen(viewModel: TaskViewModel) {
                                 onClick = { selectedEditingTask = task },
                                 onComplete = {
                                     viewModel.completeTask(task.id)
+                                },
+                                onDelete = {
+                                    viewModel.deleteTask(task.id)
                                 }
                             )
                         } else {
@@ -249,7 +253,8 @@ fun ListScreen(viewModel: TaskViewModel) {
 fun TaskLogCard(
     task: TaskEntity,
     onClick: () -> Unit,
-    onComplete: () -> Unit
+    onComplete: () -> Unit,
+    onDelete: () -> Unit
 ) {
     val qColor = when (task.quadrant) {
         1 -> QuadrantRed
@@ -308,7 +313,7 @@ fun TaskLogCard(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = if (task.actualMinutes > 0) "${task.actualMinutes}m" else "Chưa làm",
+                        text = if (task.actualSeconds > 0) "${task.actualSeconds / 60}m" else "Chưa làm",
                         color = ChronoPrimary,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
@@ -357,6 +362,16 @@ fun TaskLogCard(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.width(6.dp))
+            IconButton(onClick = onDelete) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Xóa tác vụ",
+                    tint = QuadrantRed.copy(alpha = 0.7f),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
     }
 }
@@ -372,7 +387,7 @@ fun EditSessionScreen(
     var title by remember { mutableStateOf(task.title) }
     var description by remember { mutableStateOf(task.description) }
     var estimatedMinutes by remember { mutableStateOf(task.estimatedMinutes.toString()) }
-    var actualMinutes by remember { mutableStateOf(task.actualMinutes.toString()) }
+    var actualMinutes by remember { mutableStateOf((task.actualSeconds / 60).toString()) }
     var quadrant by remember { mutableStateOf(task.quadrant) }
     var status by remember { mutableStateOf(task.status) }
 
@@ -513,6 +528,49 @@ fun EditSessionScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Text(
+                text = "TRẠNG THÁI TÁC VỤ",
+                color = ChronoTextDim,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf("WAITING", "COMPLETED").forEach { s ->
+                    val isSelected = status == s
+                    val label = if (s == "WAITING") "Đang Chờ / Chưa Xong" else "Đã Hoàn Thành"
+                    val activeColor = if (s == "COMPLETED") QuadrantGreen else ChronoPrimary
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(
+                                if (isSelected) activeColor.copy(alpha = 0.2f) else ChronoSurface,
+                                RoundedCornerShape(12.dp)
+                            )
+                            .border(
+                                1.5.dp,
+                                if (isSelected) activeColor else Color.Transparent,
+                                RoundedCornerShape(12.dp)
+                            )
+                            .clickable { status = s }
+                            .padding(vertical = 12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = label,
+                            color = if (isSelected) activeColor else ChronoText,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             // Matrix priority selector cards under wireframe 6 layout
@@ -525,10 +583,10 @@ fun EditSessionScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             val priorities = listOf(
-                PriorityData(1, "Q1", "Khẩn cấp & Quan trọng", QuadrantRed),
-                PriorityData(2, "Q2", "Quan trọng (Không khẩn)", QuadrantGreen),
-                PriorityData(3, "Q3", "Khẩn cấp (Không quan trọng)", QuadrantOrange),
-                PriorityData(4, "Q4", "Bình thường (Loại bỏ)", QuadrantGrey)
+                PriorityData(1, "Q1", "Quan trọng, Khẩn cấp", QuadrantRed),
+                PriorityData(2, "Q2", "Quan trọng, Không khẩn cấp", QuadrantGreen),
+                PriorityData(3, "Q3", "Không quan trọng, Khẩn cấp", QuadrantOrange),
+                PriorityData(4, "Q4", "Không quan trọng, Không khẩn cấp", QuadrantGrey)
             )
 
             Row(
@@ -556,13 +614,16 @@ fun EditSessionScreen(
                 } else {
                     title
                 }
+                val finalStatus = if (status == "DOING") "WAITING" else status
+                val finalCompletedAt = if (finalStatus == "COMPLETED") (task.completedAt ?: System.currentTimeMillis()) else null
                 val updated = task.copy(
                     title = finalTitle,
                     description = description,
                     estimatedMinutes = if (task.isNote) 0 else (estimatedMinutes.toIntOrNull() ?: 0),
-                    actualMinutes = if (task.isNote) 0 else (actualMinutes.toIntOrNull() ?: 0),
+                    actualSeconds = if (task.isNote) 0 else ((actualMinutes.toIntOrNull() ?: 0) * 60),
                     quadrant = if (task.isNote) 0 else quadrant,
-                    status = if (status == "DOING") "WAITING" else status,
+                    status = finalStatus,
+                    completedAt = finalCompletedAt,
                     updatedAt = System.currentTimeMillis()
                 )
                 onSave(updated)
@@ -591,7 +652,7 @@ fun EditSessionScreen(
         ) {
             Icon(Icons.Default.Delete, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("XÓA TÁC VỤ", fontWeight = FontWeight.Bold)
+            Text(if (task.isNote) "XÓA GHI CHÚ" else "XÓA TÁC VỤ", fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -698,10 +759,10 @@ fun NoteCard(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = if (isNoPriority) "Ghi chú thường" else when (note.quadrant) {
-                            1 -> "Q1: Khẩn & Quan trọng"
-                            2 -> "Q2: Quan trọng"
-                            3 -> "Q3: Khẩn"
-                            else -> "Q4: Không quan trọng"
+                            1 -> "Q1: Quan trọng, Khẩn cấp"
+                            2 -> "Q2: Quan trọng, Không khẩn cấp"
+                            3 -> "Q3: Không quan trọng, Khẩn cấp"
+                            else -> "Q4: Không quan trọng, Không khẩn cấp"
                         },
                         color = qColor,
                         fontSize = 11.sp,

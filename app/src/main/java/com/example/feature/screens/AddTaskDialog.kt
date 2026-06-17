@@ -39,7 +39,7 @@ fun AddTaskDialog(
     }
     var taskDescription by remember { mutableStateOf("") }
     var taskEstimatedMinutes by remember { mutableStateOf("30") }
-    var selectedQuadrant by remember { mutableStateOf(1) } // Default to Q1 red
+    var selectedQuadrant by remember { mutableStateOf(3) } // Default to Q3 orange (Không quan trọng - Khẩn cấp)
     var startImmediately by remember { mutableStateOf(true) }
 
     Card(
@@ -222,10 +222,10 @@ fun AddTaskDialog(
                 Spacer(modifier = Modifier.height(10.dp))
 
                 val itemsQ = listOf(
-                    PriorityItem(1, "Quan trọng - Khẩn cấp", QuadrantRed),
-                    PriorityItem(2, "Quan trọng - Không khẩn cấp", QuadrantGreen),
-                    PriorityItem(3, "Không quan trọng - Khẩn cấp", QuadrantOrange),
-                    PriorityItem(4, "Không quan trọng - Không khẩn cấp", QuadrantGrey)
+                    PriorityItem(1, "Quan trọng, Khẩn cấp", QuadrantRed),
+                    PriorityItem(2, "Quan trọng, Không khẩn cấp", QuadrantGreen),
+                    PriorityItem(3, "Không quan trọng, Khẩn cấp", QuadrantOrange),
+                    PriorityItem(4, "Không quan trọng, Không khẩn cấp", QuadrantGrey)
                 )
 
                 Row(modifier = Modifier.fillMaxWidth()) {

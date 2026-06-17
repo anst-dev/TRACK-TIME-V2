@@ -101,7 +101,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
                 description = description,
                 quadrant = quadrant,
                 estimatedMinutes = estimatedMinutes,
-                actualMinutes = 0,
+                actualSeconds = 0,
                 status = if (startTimerImmediately && !isNote) "DOING" else "WAITING",
                 date = getTodayDateString(),
                 isNote = isNote
@@ -374,7 +374,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             description = "Đặt mục tiêu KR cho quý tiếp theo",
             quadrant = 2,
             estimatedMinutes = 120,
-            actualMinutes = 135,
+            actualSeconds = 135 * 60,
             status = "COMPLETED",
             createdAt = System.currentTimeMillis() - 24 * 3600 * 1000 - 4 * 3600 * 1000,
             completedAt = System.currentTimeMillis() - 24 * 3600 * 1000,
@@ -385,7 +385,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             description = "Giải quyết các thư khẩn từ đối tác nước ngoài",
             quadrant = 3,
             estimatedMinutes = 20,
-            actualMinutes = 15,
+            actualSeconds = 15 * 60,
             status = "COMPLETED",
             createdAt = System.currentTimeMillis() - 24 * 3600 * 1000 - 9 * 3600 * 1000,
             completedAt = System.currentTimeMillis() - 24 * 3600 * 1000 - 8 * 3600 * 1000,
@@ -398,7 +398,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             description = "Chi tiết cấu trúc hệ thống microservices mới",
             quadrant = 1,
             estimatedMinutes = 45,
-            actualMinutes = 35,
+            actualSeconds = 35 * 60,
             status = "WAITING",
             date = today
         )
@@ -407,7 +407,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             description = "Thiết kế giao diện Chrono-Focus Dark theme cho Mobile",
             quadrant = 2,
             estimatedMinutes = 120,
-            actualMinutes = 0,
+            actualSeconds = 0,
             status = "WAITING",
             date = today
         )
@@ -416,7 +416,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             description = "Soạn thảo hướng dẫn sử dụng API v4",
             quadrant = 3,
             estimatedMinutes = 60,
-            actualMinutes = 0,
+            actualSeconds = 0,
             status = "WAITING",
             date = today
         )
@@ -425,7 +425,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             description = "Lướt xem sản phẩm của đối thủ cạnh tranh",
             quadrant = 4,
             estimatedMinutes = 45,
-            actualMinutes = 12,
+            actualSeconds = 12 * 60,
             status = "WAITING",
             date = today
         )
@@ -444,7 +444,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             description = "Nghiên cứu tích hợp API của Google Sheets v4 để tự động trích xuất báo cáo hàng ngày.",
             quadrant = 0,
             estimatedMinutes = 0,
-            actualMinutes = 0,
+            actualSeconds = 0,
             status = "WAITING",
             date = today,
             isNote = true
@@ -454,7 +454,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             description = "Đi họp lúc 14:00 bàn về thiết kế UI Bold Typography và tối ưu hoá UX cho di động.",
             quadrant = 0,
             estimatedMinutes = 0,
-            actualMinutes = 0,
+            actualSeconds = 0,
             status = "WAITING",
             date = today,
             isNote = true
@@ -464,7 +464,7 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
             description = "Cần đơn giản hóa thao tác tắt/bật bộ đếm thời gian từ màn hình chính.",
             quadrant = 0,
             estimatedMinutes = 0,
-            actualMinutes = 0,
+            actualSeconds = 0,
             status = "WAITING",
             date = today,
             isNote = true
@@ -474,16 +474,111 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         repository.insertTask(n3)
 
         // Insert TimeLogs
-        repository.insertTimeLog(TimeLogEntity(taskId = y1Id, startTime = System.currentTimeMillis() - 24*3600*1000 - 2*3600*1000, endTime = System.currentTimeMillis() - 24*3600*1000 - 15*60*1000, durationMinutes = 135))
-        repository.insertTimeLog(TimeLogEntity(taskId = y2Id, startTime = System.currentTimeMillis() - 24*3600*1000 - 9*3600*1000, endTime = System.currentTimeMillis() - 24*3600*1000 - 8*3600*1000, durationMinutes = 15))
+        repository.insertTimeLog(TimeLogEntity(taskId = y1Id, startTime = System.currentTimeMillis() - 24*3600*1000 - 2*3600*1000, endTime = System.currentTimeMillis() - 24*3600*1000 - 15*60*1000, durationSeconds = 135 * 60))
+        repository.insertTimeLog(TimeLogEntity(taskId = y2Id, startTime = System.currentTimeMillis() - 24*3600*1000 - 9*3600*1000, endTime = System.currentTimeMillis() - 24*3600*1000 - 8*3600*1000, durationSeconds = 15 * 60))
         
-        repository.insertTimeLog(TimeLogEntity(taskId = t1Id, startTime = System.currentTimeMillis() - 50*60*1000, endTime = System.currentTimeMillis() - 15*60*1000, durationMinutes = 35))
-        repository.insertTimeLog(TimeLogEntity(taskId = t4Id, startTime = System.currentTimeMillis() - 12*60*1000, endTime = System.currentTimeMillis(), durationMinutes = 12))
+        repository.insertTimeLog(TimeLogEntity(taskId = t1Id, startTime = System.currentTimeMillis() - 50*60*1000, endTime = System.currentTimeMillis() - 15*60*1000, durationSeconds = 35 * 60))
+        repository.insertTimeLog(TimeLogEntity(taskId = t4Id, startTime = System.currentTimeMillis() - 12*60*1000, endTime = System.currentTimeMillis(), durationSeconds = 12 * 60))
 
         // Create initial sync logs
         repository.insertSyncLog(SyncLogEntity(timestamp = System.currentTimeMillis() - 2 * 3600 * 1000, status = "Thành công", message = "Đồng bộ thành công dữ liệu ngày hôm qua."))
         repository.insertSyncLog(SyncLogEntity(timestamp = System.currentTimeMillis() - 1 * 3600 * 1000, status = "Thành công", message = "Đồng bộ thành công 2 tác vụ lên Google Sheets."))
         repository.insertSyncLog(SyncLogEntity(timestamp = System.currentTimeMillis() - 30 * 60 * 1000, status = "Thất bại", message = "Lỗi kết nối máy chủ Google API."))
+    }
+
+    fun exportTasksToExcel(context: android.content.Context) {
+        viewModelScope.launch {
+            try {
+                // Get all tasks from repository
+                val tasks = allTasks.value
+                if (tasks.isEmpty()) {
+                    android.widget.Toast.makeText(context, "Không có dữ liệu tác vụ để xuất file!", android.widget.Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                // Create a temporary CSV file
+                val file = java.io.File(context.cacheDir, "TimeTracker_Tasks_Export.csv")
+                val fos = java.io.FileOutputStream(file)
+                
+                // Write UTF-8 BOM to display accented characters correctly in Excel
+                fos.write(byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte()))
+                
+                val writer = java.io.BufferedWriter(java.io.OutputStreamWriter(fos, "UTF-8"))
+                
+                // Headers: ID, Tiêu đề, Mô tả, Mức độ ưu tiên, Loại, Dự kiến (phút), Thực tế (phút), Trạng thái, Ngày tạo
+                writer.write("ID,Tiêu đề,Mô tả,Mức độ ưu tiên,Loại,Dự kiến (phút),Thực tế (phút),Trạng thái,Ngày\n")
+                
+                for (task in tasks) {
+                    val id = task.id
+                    val title = sanitizeCsvField(task.title)
+                    val desc = sanitizeCsvField(task.description)
+                    val priority = when (task.quadrant) {
+                        1 -> "Q1: Quan trọng, Khẩn cấp"
+                        2 -> "Q2: Quan trọng, Không khẩn cấp"
+                        3 -> "Q3: Không quan trọng, Khẩn cấp"
+                        4 -> "Q4: Không quan trọng, Không khẩn cấp"
+                        else -> "Không phân loại"
+                    }
+                    val type = if (task.isNote) "Ghi chú" else "Công việc"
+                    val estMin = task.estimatedMinutes
+                    val actMin = task.actualSeconds / 60
+                    val status = task.status
+                    val date = task.date
+                    
+                    writer.write("$id,$title,$desc,\"$priority\",$type,$estMin,$actMin,$status,$date\n")
+                }
+                
+                writer.flush()
+                writer.close()
+                fos.close()
+                
+                // Share/Open via Intent
+                val authority = context.packageName + ".fileprovider"
+                val uri = androidx.core.content.FileProvider.getUriForFile(context, authority, file)
+                
+                val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                    type = "text/comma-separated-values"
+                    putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                    putExtra(android.content.Intent.EXTRA_SUBJECT, "Xuất file excel tác vụ Time Tracker")
+                    putExtra(android.content.Intent.EXTRA_TEXT, "Gửi từ ứng dụng Time Tracker.")
+                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                
+                val chooser = android.content.Intent.createChooser(intent, "Chia sẻ / Lưu file Excel (CSV)")
+                chooser.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(chooser)
+                
+            } catch (e: Exception) {
+                Log.e("TaskViewModel", "Lỗi xuất file Excel: ${e.message}", e)
+                android.widget.Toast.makeText(context, "Lỗi xuất file Excel: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun sanitizeCsvField(field: String): String {
+        if (field.isEmpty()) return ""
+        var clean = field.replace("\"", "\"\"") // Escape double quotes
+        if (clean.contains(",") || clean.contains("\n") || clean.contains("\r") || clean.contains("\"")) {
+            clean = "\"$clean\""
+        }
+        return clean
+    }
+
+    fun openGoogleSheetInBrowser(context: android.content.Context) {
+        val sheetId = googleSheetId.value
+        val url = if (sheetId.isNotEmpty()) {
+            "https://docs.google.com/spreadsheets/d/$sheetId/edit"
+        } else {
+            "https://docs.google.com/spreadsheets"
+        }
+        try {
+            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url)).apply {
+                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            android.widget.Toast.makeText(context, "Không thể mở trình duyệt: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+        }
     }
 }
 

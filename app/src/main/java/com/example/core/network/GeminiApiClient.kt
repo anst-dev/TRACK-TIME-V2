@@ -56,14 +56,14 @@ object GeminiApiClient {
         }
 
         // Build a highly descriptive prompt in Vietnamese, requesting structured JSON back
-        val totalWorkTime = timeLogs.sumOf { it.durationMinutes }
-        val q1Time = tasks.filter { it.quadrant == 1 }.sumOf { it.actualMinutes }
-        val q2Time = tasks.filter { it.quadrant == 2 }.sumOf { it.actualMinutes }
-        val q3Time = tasks.filter { it.quadrant == 3 }.sumOf { it.actualMinutes }
-        val q4Time = tasks.filter { it.quadrant == 4 }.sumOf { it.actualMinutes }
+        val totalWorkTime = timeLogs.sumOf { it.durationSeconds } / 60
+        val q1Time = tasks.filter { it.quadrant == 1 }.sumOf { it.actualSeconds / 60 }
+        val q2Time = tasks.filter { it.quadrant == 2 }.sumOf { it.actualSeconds / 60 }
+        val q3Time = tasks.filter { it.quadrant == 3 }.sumOf { it.actualSeconds / 60 }
+        val q4Time = tasks.filter { it.quadrant == 4 }.sumOf { it.actualSeconds / 60 }
 
         val taskSummary = tasks.joinToString("\n") { task ->
-            "- ${task.title} (Nhóm ${task.quadrant}, Ước tính: ${task.estimatedMinutes} phút, Thực tế: ${task.actualMinutes} phút, Trạng thái: ${task.status})"
+            "- ${task.title} (Nhóm ${task.quadrant}, Ước tính: ${task.estimatedMinutes} phút, Thực tế: ${task.actualSeconds / 60} phút tương đương ${task.actualSeconds} giây, Trạng thái: ${task.status})"
         }
 
         val prompt = """
