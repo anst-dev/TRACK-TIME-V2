@@ -566,7 +566,9 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
 
     fun openGoogleSheetInBrowser(context: android.content.Context) {
         val sheetId = googleSheetId.value
-        val url = if (sheetId.isNotEmpty()) {
+        val url = if (sheetId.startsWith("http://") || sheetId.startsWith("https://")) {
+            sheetId
+        } else if (sheetId.isNotEmpty()) {
             "https://docs.google.com/spreadsheets/d/$sheetId/edit"
         } else {
             "https://docs.google.com/spreadsheets"

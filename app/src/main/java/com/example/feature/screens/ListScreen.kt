@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -264,112 +266,68 @@ fun TaskLogCard(
     }
 
     Card(
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = ChronoSurface),
-        border = BorderStroke(1.dp, qColor.copy(alpha = 0.4f)),
+        border = BorderStroke(1.dp, qColor.copy(alpha = 0.2f)),
         modifier = Modifier
             .fillMaxWidth()
             .testTag("task_item_card")
             .clickable { onClick() }
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon representing Priority Quadrant symbol
-            val icon = when (task.quadrant) {
-                1 -> Icons.Default.Warning
-                2 -> Icons.Default.CalendarMonth
-                3 -> Icons.Default.Notifications
-                else -> Icons.Default.Block
-            }
-
+            // Priority icon indicator (small)
             Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .background(qColor.copy(alpha = 0.15f), RoundedCornerShape(12.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = qColor,
-                    modifier = Modifier.size(20.dp)
+                    .size(12.dp)
+                    .background(qColor, androidx.compose.foundation.shape.CircleShape)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = task.title,
+                    color = ChronoText,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
             }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // Time and status
+            Text(
+                text = "${if (task.actualSeconds > 0) task.actualSeconds / 60 else 0}/${task.estimatedMinutes}m",
+                color = ChronoTextDim,
+                fontSize = 12.sp,
+                fontFamily = FontFamily.Monospace
+            )
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Column(modifier = Modifier.weight(1.0f)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = task.title,
-                        color = ChronoText,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = if (task.actualSeconds > 0) "${task.actualSeconds / 60}m" else "Chưa làm",
-                        color = ChronoPrimary,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = if (task.description.isEmpty()) "Không có ghi chú..." else task.description,
-                    color = ChronoTextDim,
-                    fontSize = 12.sp,
-                    maxLines = 2
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.AccessTime,
-                        contentDescription = null,
-                        tint = ChronoTextDim,
-                        modifier = Modifier.size(12.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Ước lượng: ${task.estimatedMinutes} phút",
-                        color = ChronoTextDim,
-                        fontSize = 10.sp
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = "Trạng thái: ${if (task.status == "COMPLETED") "Hoàn thành" else if (task.status == "DOING") "Đang chạy" else "Chờ"}",
-                        color = if (task.status == "COMPLETED") QuadrantGreen else ChronoPrimary,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
             if (task.status != "COMPLETED") {
-                Spacer(modifier = Modifier.width(10.dp))
-                IconButton(onClick = onComplete) {
+                IconButton(
+                    onClick = onComplete,
+                    modifier = Modifier.size(28.dp)
+                ) {
                     Icon(
-                        imageVector = Icons.Default.CheckCircle,
+                        imageVector = Icons.Default.CheckCircleOutline,
                         contentDescription = "Hoàn thành",
-                        tint = ChronoTextDim,
+                        tint = ChronoPrimary,
                         modifier = Modifier.size(24.dp)
                     )
                 }
-            }
-
-            Spacer(modifier = Modifier.width(6.dp))
-            IconButton(onClick = onDelete) {
+            } else {
                 Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Xóa tác vụ",
-                    tint = QuadrantRed.copy(alpha = 0.7f),
-                    modifier = Modifier.size(20.dp)
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = "Đã xong",
+                    tint = QuadrantGreen,
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
@@ -391,10 +349,13 @@ fun EditSessionScreen(
     var quadrant by remember { mutableStateOf(task.quadrant) }
     var status by remember { mutableStateOf(task.status) }
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(ChronoBackground)
+            .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
         // Appbar for editing
@@ -604,7 +565,7 @@ fun EditSessionScreen(
             }
         }
 
-        Spacer(modifier = Modifier.weight(1.0f))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Complete save and delete actions
         Button(

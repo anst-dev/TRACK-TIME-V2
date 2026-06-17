@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import com.example.feature.task.TaskViewModel
 import com.example.ui.theme.*
 import java.text.SimpleDateFormat
@@ -27,7 +29,17 @@ fun AddTaskDialog(
     viewModel: TaskViewModel,
     onDismiss: () -> Unit
 ) {
-    var activeTabIsWork by remember { mutableStateOf(true) } // Tabs: Work vs Note
+    var activeTabIsWork by remember { mutableStateOf(false) } // Tabs: Work vs Note
+
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        try {
+            focusRequester.requestFocus()
+        } catch (e: Exception) {
+            // ignore
+        }
+    }
 
     var taskTitle by remember { mutableStateOf("") }
     
@@ -153,7 +165,9 @@ fun AddTaskDialog(
                     focusedBorderColor = AccentBlue,
                     unfocusedBorderColor = Color.Transparent
                 ),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
             )
 
             Spacer(modifier = Modifier.height(14.dp))
